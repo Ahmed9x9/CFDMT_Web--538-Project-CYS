@@ -13,7 +13,6 @@ JPEG_END = b"\xff\xd9"
 RAR4_SIGNATURE = b"Rar!\x1a\x07\x00"
 RAR5_SIGNATURE = b"Rar!\x1a\x07\x01\x00"
 SEVEN_Z_SIGNATURE = b"7z\xbc\xaf\x27\x1c"
-SUPPORTED_EXTENSIONS = {"png", "jpg", "jpeg", "pdf", "zip", "rar", "7z"}
 
 
 def _read_prefix(path: Path, size: int = 1024) -> bytes:
@@ -49,32 +48,12 @@ def _finding(
         "type": _file_type(path),
         "status": status,
         "result_status": status,
+        "check_code": check_code,
+        "severity": severity,
+        "evidence": evidence,
+        "recommendation": recommendation,
         "sha256": integrity["sha256"],
         "size_bytes": integrity["size"],
-        "summary": evidence,
-        "evidence_text": evidence,
-        "recommendation": recommendation,
-        "evidence_hint": recommendation,
-        "summary_evidence": {
-            "code": check_code,
-            "severity": severity,
-            "detail": evidence,
-            "suggested_action": recommendation,
-        },
-        "evidence": [
-            {
-                "check": check_code,
-                "severity": severity,
-                "detail": evidence,
-                "recommendation": recommendation,
-            }
-        ],
-        "explanations": [
-            {
-                "title": check_code.replace("_", " ").title(),
-                "description": evidence,
-            }
-        ],
     }
 
 
@@ -224,6 +203,17 @@ def _scan_7z(path: Path) -> dict[str, Any]:
     return _clean(path, "7Z archive signature was found.")
 
 
+SCAN_HANDLERS = {
+    "png": _scan_png,
+    "jpg": _scan_jpeg,
+    "jpeg": _scan_jpeg,
+    "pdf": _scan_pdf,
+    "zip": _scan_zip,
+    "rar": _scan_rar,
+    "7z": _scan_7z,
+}
+
+
 def scan_file(path: str | Path, profile: str = "full") -> dict[str, Any]:
     file_path = Path(path)
     if not file_path.is_file():
@@ -239,25 +229,16 @@ def scan_file(path: str | Path, profile: str = "full") -> dict[str, Any]:
         )
 
     extension = file_path.suffix.lower().lstrip(".")
-    if extension == "png":
-        return _scan_png(file_path)
-    if extension in {"jpg", "jpeg"}:
-        return _scan_jpeg(file_path)
-    if extension == "pdf":
-        return _scan_pdf(file_path)
-    if extension == "zip":
-        return _scan_zip(file_path)
-    if extension == "rar":
-        return _scan_rar(file_path)
-    if extension == "7z":
-        return _scan_7z(file_path)
+    handler = SCAN_HANDLERS.get(extension)
+    if handler:
+        return handler(file_path)
 
     return _finding(
         file_path,
         status="suspicious",
         check_code="UNSUPPORTED_FILE_TYPE",
         severity="medium",
-        evidence="This public engine only supports PNG, JPG, PDF, ZIP, RAR, and 7Z files.",
+        evidence="This public engine only supports PNG, JPG/JPEG, PDF, ZIP, RAR, and 7Z files.",
         recommendation="Upload one of the supported file types.",
     )
 

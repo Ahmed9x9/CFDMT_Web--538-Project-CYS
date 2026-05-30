@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import os
@@ -129,28 +129,8 @@ def _matching_scan_record(scan_payload: dict[str, Any], path: Path) -> dict[str,
 def _evidence_text(record: dict[str, Any] | None) -> str:
     if not record:
         return "No corruption evidence found."
-    for key in ("evidence_text", "summary", "latest_evidence"):
-        value = str(record.get(key) or "").strip()
-        if value:
-            return value
-    explanations = record.get("explanations")
-    if isinstance(explanations, list) and explanations:
-        first = explanations[0]
-        if isinstance(first, dict):
-            title = str(first.get("title") or "").strip()
-            description = str(first.get("description") or "").strip()
-            if title and description:
-                return f"{title}: {description}"
-            if title:
-                return title
-    evidence = record.get("evidence")
-    if isinstance(evidence, list) and evidence:
-        first = evidence[0]
-        if isinstance(first, dict):
-            check = str(first.get("check") or "Integrity issue").replace("_", " ")
-            detail = str(first.get("detail") or "").strip()
-            return f"{check}: {detail}" if detail else check
-    return "The scanner flagged this file for review."
+    value = str(record.get("evidence") or "").strip()
+    return value or "The scanner flagged this file for review."
 
 
 def _status_slug_from_scan_record(record: dict[str, Any] | None) -> str:
@@ -159,69 +139,29 @@ def _status_slug_from_scan_record(record: dict[str, Any] | None) -> str:
     explicit = str(record.get("status") or record.get("result_status") or "").lower()
     if explicit in {"clean", "suspicious", "corrupted"}:
         return explicit
-    evidence = record.get("evidence") if isinstance(record, dict) else None
-    severities: list[str] = []
-    if isinstance(evidence, list):
-        severities = [
-            str(item.get("severity", "")).lower()
-            for item in evidence
-            if isinstance(item, dict)
-        ]
-    if any(level in {"high", "critical"} for level in severities):
-        return "corrupted"
     return "suspicious"
 
 
 def _severity_from_scan_record(record: dict[str, Any] | None) -> str:
     if not record:
         return "info"
-    summary = record.get("summary_evidence")
-    if isinstance(summary, dict):
-        severity = str(summary.get("severity") or "").lower()
-        if severity in {"info", "low", "medium", "high", "critical"}:
-            return severity
-    evidence = record.get("evidence") if isinstance(record, dict) else None
-    if isinstance(evidence, list):
-        for item in evidence:
-            if isinstance(item, dict):
-                severity = str(item.get("severity") or "").lower()
-                if severity in {"info", "low", "medium", "high", "critical"}:
-                    return severity
-    confidence = str(record.get("confidence") or "").lower()
-    if confidence in {"low", "medium", "high"}:
-        return confidence
+    severity = str(record.get("severity") or "").lower()
+    if severity in {"info", "low", "medium", "high", "critical"}:
+        return severity
     return "medium"
 
 
 def _check_code_from_scan_record(record: dict[str, Any] | None) -> str:
     if not record:
         return "NO_CORRUPTION_FOUND"
-    summary = record.get("summary_evidence")
-    if isinstance(summary, dict) and summary.get("code"):
-        return str(summary["code"])
-    evidence = record.get("evidence")
-    if isinstance(evidence, list):
-        for item in evidence:
-            if isinstance(item, dict) and item.get("check"):
-                return str(item["check"])
-    return "GENERIC_CORRUPTION"
+    return str(record.get("check_code") or "GENERIC_CORRUPTION")
 
 
 def _recommendation_from_scan_record(record: dict[str, Any] | None) -> str:
     if not record:
         return "No action is required."
-    for key in ("evidence_hint", "recommendation"):
-        value = str(record.get(key) or "").strip()
-        if value:
-            return value
-    summary = record.get("summary_evidence")
-    if isinstance(summary, dict):
-        for key in ("suggested_action", "hint"):
-            value = str(summary.get(key) or "").strip()
-            if value:
-                return value
-    return "Review the evidence and restore a known-good copy if needed."
-
+    value = str(record.get("recommendation") or "").strip()
+    return value or "Review the evidence and restore a known-good copy if needed."
 
 def _require_engine_token(token: str | None) -> None:
     if not token or not secrets.compare_digest(token, ENGINE_SECRET):

@@ -70,15 +70,14 @@ def repair_single_file(file_path, *, backup_dir, cancel_event=None) -> RepairRes
         raise FileNotFoundError(f"File does not exist: {path}")
 
     before = scan_file(path, "full")
-    check_code = str((before.get("summary_evidence") or {}).get("code") or "")
-    backup_path = _backup_file(path, backup_root)
+    check_code = str(before.get("check_code") or "")
 
     if before.get("status") == "clean":
         return RepairResult(
             success=False,
             message="No repair was needed because the file passed the basic integrity checks.",
             repaired_path=str(path),
-            backup_path=str(backup_path),
+            backup_path=None,
             details={
                 "repair_type": "none",
                 "before": before,
@@ -91,7 +90,7 @@ def repair_single_file(file_path, *, backup_dir, cancel_event=None) -> RepairRes
             success=False,
             message="Repair was cancelled.",
             repaired_path=str(path),
-            backup_path=str(backup_path),
+            backup_path=None,
             details={
                 "repair_type": "cancelled",
                 "before": before,
@@ -99,6 +98,7 @@ def repair_single_file(file_path, *, backup_dir, cancel_event=None) -> RepairRes
             },
         )
 
+    backup_path = _backup_file(path, backup_root)
     repaired, message, repaired_path = _try_basic_repair(path, check_code)
     after = scan_file(repaired_path, "full") if repaired_path.is_file() else before
     validation_passed = after.get("status") == "clean"
