@@ -1,0 +1,61 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: cfdmt_web
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/full_data.sql:/docker-entrypoint-initdb.d/02_full_data.sql:ro
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ./:/var/www/html:cached
+    working_dir: /var/www/html
+    environment:
+      CFDMT_DB_HOST: db
+      CFDMT_DB_NAME: cfdmt_web
+      CFDMT_DB_USER: root
+      CFDMT_DB_PASS: rootpass
+      CFDMT_ENGINE_URL: http://python:8000
+      CFDMT_ENGINE_SECRET: cfdmt-web-dev-engine-secret-change-in-production
+      CFDMT_DOWNLOAD_SECRET: cfdmt-web-dev-download-secret-change-in-production
+    command: ["sh", "-c", "php api/bootstrap_demo_admin.php && php -S 0.0.0.0:8001 -t . api/router.php"]
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+      - python
+
+  python:
+    build:
+      context: .
+      dockerfile: docker/python/Dockerfile
+    volumes:
+      - ./backend:/app
+      - ./cfdmt_tool:/tool
+      - ./api/uploads:/var/www/html/api/uploads
+      - ./api/repaired:/var/www/html/api/repaired
+    environment:
+      CFDMT_API_HOST: 0.0.0.0
+      CFDMT_API_PORT: 8000
+      CFDMT_TOOL_ROOT: /tool
+      CFDMT_ENGINE_SECRET: cfdmt-web-dev-engine-secret-change-in-production
+      CFDMT_ENGINE_CORS_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      CFDMT_MANAGED_FILE_ROOTS: /var/www/html/api/uploads,/var/www/html/api/repaired
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - php
+      - python

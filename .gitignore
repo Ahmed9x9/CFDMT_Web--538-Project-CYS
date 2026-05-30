@@ -1,0 +1,48 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+.api-dev.*
+.vite-dev.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+backend/*.log
+
+# Dependencies and build output
+node_modules
+dist
+dist-ssr
+.npm-cache
+
+# Local runtime data
+*.local
+.qodo
+sql/
+backend/cfdmt_state.json
+backend/uploads/
+backend/repair_backups/
+api/uploads/
+api/repaired/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
