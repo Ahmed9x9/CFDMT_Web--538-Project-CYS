@@ -92,9 +92,3 @@ The demo data is sanitized and uses decoy accounts only.
 - Abdulilah F. Al-Mudarra
 - Ali J. Al-Abdullatif
 
-
-## Copyright Notice
-
-This repository is private and is submitted only for the CYS 538 course project.
-
-No permission is granted to use, copy, modify, distribute, publish, or reuse this project or any part of it without written permission from the authors.
