@@ -13,7 +13,6 @@ docker compose up --build --force-recreate
 
 Open the website at http://localhost:8080.
 
-Admin login: decoy.admin@cfdmt.test / password.
 
 ## Stack
 

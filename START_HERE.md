@@ -20,7 +20,6 @@ docker compose up --build --force-recreate
 
 ## Included Accounts
 
-- Admin: `decoy.admin@cfdmt.test` / `password`
 - Demo users: `nora.decoy@cfdmt.test`, `omar.decoy@cfdmt.test`, `sara.decoy@cfdmt.test`, `khalid.decoy@cfdmt.test` / `password`
 
 
