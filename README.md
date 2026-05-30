@@ -2,6 +2,12 @@
 
 Corrupted File Detection and Management Tool Web is a Docker-ready website for uploading files, scanning them for basic integrity problems, repairing supported corruption cases, and reviewing scan/repair history.
 
+## Project Presentation
+
+The project presentation video can be viewed here:
+
+https://drive.google.com/file/d/1WqhW5Fkgpx_ZofLixySbpq-R_eK8UtOF/view?usp=sharing
+
 ## Quick Start
 
 Use Docker from the project root, the same folder that contains `docker-compose.yml`:
