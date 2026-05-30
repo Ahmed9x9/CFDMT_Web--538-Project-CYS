@@ -83,3 +83,11 @@ Docker imports the database automatically using:
 - `database/full_data.sql`
 
 The demo data is sanitized and uses decoy accounts only.
+
+
+## Team Members
+
+- Ahmed A. Al-Shaikh Mohammed
+- Mohammed A. Al-Moammar
+- Abdulilah F. Al-Mudarra
+- Ali J. Al-Abdullatif
