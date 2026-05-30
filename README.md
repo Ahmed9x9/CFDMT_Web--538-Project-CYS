@@ -1,4 +1,4 @@
-﻿# CFDMT Web
+# CFDMT Web
 
 Corrupted File Detection and Management Tool Web is a Docker-ready website for uploading files, scanning them for basic integrity problems, repairing supported corruption cases, and reviewing scan/repair history.
 
@@ -12,6 +12,8 @@ docker compose up --build --force-recreate
 ```
 
 Open the website at http://localhost:8080.
+
+Admin login: decoy.admin@cfdmt.test / password.
 
 ## Stack
 
@@ -30,7 +32,6 @@ backend/              FastAPI bridge used by the PHP API for scan and repair act
 cfdmt_tool/           Public Python scan/repair engine for PNG, JPG, PDF, ZIP, RAR, and 7Z
 database/             MySQL schema and sanitized demo data
 docker/               Dockerfiles and nginx configuration
-docs/                 Supporting design and implementation notes
 public/               Static frontend assets
 src/                  React frontend source code
 START_HERE.md         Main setup instructions for running the website
@@ -91,4 +92,3 @@ The demo data is sanitized and uses decoy accounts only.
 - Mohammed A. Al-Moammar
 - Abdulilah F. Al-Mudarra
 - Ali J. Al-Abdullatif
-

@@ -1,4 +1,4 @@
-﻿# CFDMT Web - Quick Start
+# CFDMT Web - Quick Start
 
 ## Recommended: Docker
 
@@ -20,6 +20,7 @@ docker compose up --build --force-recreate
 
 ## Included Accounts
 
+- Admin: `decoy.admin@cfdmt.test` / `password`
 - Demo users: `nora.decoy@cfdmt.test`, `omar.decoy@cfdmt.test`, `sara.decoy@cfdmt.test`, `khalid.decoy@cfdmt.test` / `password`
 
 
@@ -46,5 +47,3 @@ Docker keeps the MySQL volume between runs. Use `down -v` when you want Docker t
 docker compose down -v --remove-orphans
 docker compose up --build --force-recreate
 ```
-
-
